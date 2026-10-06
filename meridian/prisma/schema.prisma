@@ -1,0 +1,389 @@
+// Meridian schema. Works on SQLite (local) and PostgreSQL (production).
+// To switch: change `provider` below to "postgresql" and set DATABASE_URL.
+// No enums and no native-only types on purpose: statuses are Strings validated by Zod
+// (see src/lib/constants.ts) and list fields are JSON strings (see src/lib/tags.ts).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Auth and people ──────────────────────────────────────────────
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String?
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  onboardedAt   DateTime?
+  createdAt     DateTime       @default(now())
+  profile       Profile?
+  accounts      Account[]
+  sessions      Session[]
+  memberships   Membership[]
+  notifications Notification[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Profile {
+  userId      String  @id
+  headline    String?
+  currentRole String?
+  company     String?
+  industry    String?
+  bio         String?
+  linkedinUrl String?
+  expertise   String  @default("[]") // JSON string[]
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ── Circles ──────────────────────────────────────────────────────
+model Circle {
+  id          String        @id @default(cuid())
+  name        String
+  purpose     String
+  cadence     String? // weekly | biweekly | monthly
+  accent      String        @default("indigo")
+  inviteCode  String        @unique // 8 chars, unambiguous alphabet
+  inviteOpen  Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  members     Membership[]
+  goals       Goal[]
+  meetings    Meeting[]
+  actionItems ActionItem[]
+  decisions   Decision[]
+  opportunities Opportunity[]
+  board       Board?
+  cards       ProjectCard[]
+  polls       Poll[]
+  resources   Resource[]
+  comments    Comment[]
+  activity    Activity[]
+}
+
+model Membership {
+  id          String   @id @default(cuid())
+  circleId    String
+  userId      String
+  role        String   @default("MEMBER") // FOUNDER | MEMBER
+  workingOn   String?
+  canHelpWith String?
+  lookingFor  String?
+  joinedAt    DateTime @default(now())
+  circle      Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, userId])
+  @@index([userId])
+}
+
+// ── Goals and check-ins ──────────────────────────────────────────
+model Goal {
+  id          String    @id @default(cuid())
+  circleId    String
+  ownerId     String
+  title       String
+  description String?
+  target      String?
+  deadline    DateTime?
+  quarter     String // e.g. 2026-Q4
+  status      String    @default("ON_TRACK") // ON_TRACK | AT_RISK | DONE
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  circle      Circle    @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  checkIns    CheckIn[]
+
+  @@index([circleId, quarter])
+  @@index([ownerId])
+}
+
+model CheckIn {
+  id         String   @id @default(cuid())
+  goalId     String
+  authorId   String
+  progressed String
+  blocked    String?
+  helpNeeded String?
+  createdAt  DateTime @default(now())
+  goal       Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+}
+
+// ── Meetings, decisions, action items ────────────────────────────
+model Meeting {
+  id          String       @id @default(cuid())
+  circleId    String
+  createdById String
+  title       String
+  startsAt    DateTime
+  location    String?
+  videoUrl    String?
+  notesMd     String       @default("")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  circle      Circle       @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  agenda      AgendaItem[]
+  decisions   Decision[]
+  actionItems ActionItem[]
+
+  @@index([circleId, startsAt])
+}
+
+model AgendaItem {
+  id        String  @id @default(cuid())
+  meetingId String
+  text      String
+  position  Int
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+model ActionItem {
+  id        String    @id @default(cuid())
+  circleId  String
+  meetingId String?
+  ownerId   String
+  title     String
+  dueDate   DateTime?
+  done      Boolean   @default(false)
+  doneAt    DateTime?
+  createdAt DateTime  @default(now())
+  circle    Circle    @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  meeting   Meeting?  @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId, done])
+  @@index([circleId, done])
+}
+
+model Decision {
+  id          String                @id @default(cuid())
+  circleId    String
+  meetingId   String?
+  createdById String
+  title       String
+  context     String
+  decidedOn   DateTime
+  status      String                @default("ACTIVE") // ACTIVE | REVISITED | REVERSED
+  createdAt   DateTime              @default(now())
+  circle      Circle                @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  meeting     Meeting?              @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+  involved    DecisionParticipant[]
+
+  @@index([circleId, decidedOn])
+}
+
+model DecisionParticipant {
+  decisionId String
+  userId     String
+  decision   Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+
+  @@id([decisionId, userId])
+}
+
+// ── Opportunities ────────────────────────────────────────────────
+model Opportunity {
+  id          String   @id @default(cuid())
+  circleId    String
+  authorId    String
+  type        String // JOB_LEAD | INTRO | COLLAB | REFERRAL | QUESTION
+  title       String
+  description String
+  tags        String   @default("[]")
+  status      String   @default("OPEN") // OPEN | FILLED | CLOSED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  circle      Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@index([circleId, status])
+}
+
+// ── Projects (Kanban) ────────────────────────────────────────────
+model Board {
+  id       String        @id @default(cuid())
+  circleId String        @unique
+  circle   Circle        @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  columns  BoardColumn[]
+}
+
+model BoardColumn {
+  id       String        @id @default(cuid())
+  boardId  String
+  name     String
+  position Int
+  board    Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards    ProjectCard[]
+}
+
+model ProjectCard {
+  id          String          @id @default(cuid())
+  columnId    String
+  circleId    String
+  title       String
+  description String?
+  ownerId     String?
+  dueDate     DateTime?
+  label       String?
+  position    Float // fractional indexing: one write per drag
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  column      BoardColumn     @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  circle      Circle          @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  checklist   ChecklistItem[]
+
+  @@index([columnId, position])
+}
+
+model ChecklistItem {
+  id       String      @id @default(cuid())
+  cardId   String
+  text     String
+  done     Boolean     @default(false)
+  position Int
+  card     ProjectCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
+
+// ── Polls ────────────────────────────────────────────────────────
+model Poll {
+  id        String       @id @default(cuid())
+  circleId  String
+  authorId  String
+  question  String
+  closesAt  DateTime?
+  createdAt DateTime     @default(now())
+  circle    Circle       @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  options   PollOption[]
+  votes     PollVote[]
+}
+
+model PollOption {
+  id       String     @id @default(cuid())
+  pollId   String
+  text     String
+  position Int
+  poll     Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes    PollVote[]
+}
+
+model PollVote {
+  id       String     @id @default(cuid())
+  pollId   String
+  optionId String
+  userId   String
+  poll     Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option   PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId]) // one vote per member, enforced by the database
+}
+
+// ── Library ──────────────────────────────────────────────────────
+model Resource {
+  id        String   @id @default(cuid())
+  circleId  String
+  authorId  String
+  kind      String // LINK | FILE | NOTE
+  title     String
+  url       String?
+  filePath  String?
+  body      String?
+  whyUseful String
+  tags      String   @default("[]")
+  createdAt DateTime @default(now())
+  circle    Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@index([circleId])
+}
+
+// ── Cross-cutting ────────────────────────────────────────────────
+model Comment {
+  id         String     @id @default(cuid())
+  circleId   String
+  authorId   String
+  targetType String // GOAL | CHECKIN | OPPORTUNITY | CARD | DECISION | MEETING
+  targetId   String
+  body       String
+  createdAt  DateTime   @default(now())
+  circle     Circle     @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  reactions  Reaction[]
+
+  @@index([targetType, targetId])
+}
+
+// Reactions live on a comment or directly on a goal/card (targetType + targetId).
+// `scope` is the comment id or "TYPE:targetId", so one non-null column can be unique.
+model Reaction {
+  id         String   @id @default(cuid())
+  scope      String
+  commentId  String?
+  targetType String?
+  targetId   String?
+  userId     String
+  key        String // thumbs | target | bulb | raised | fire
+  createdAt  DateTime @default(now())
+  comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, scope, key])
+  @@index([scope])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  circleId  String
+  type      String // ACTION_ITEM | MEETING | OPPORTUNITY | COMMENT | POLL
+  title     String
+  href      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  circleId  String
+  actorId   String
+  verb      String
+  summary   String
+  href      String
+  createdAt DateTime @default(now())
+  circle    Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@index([circleId, createdAt])
+}

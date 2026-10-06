@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens. Source of truth for color; scripts/check-contrast.ts parses this file. */
+:root {
+  --bg: #fff9f0;
+  --surface: #ffffff;
+  --ink: #1b1a2e;
+  --ink-soft: #4a4863;
+  --line: #e8e0d0;
+  --primary: #4b3bd6;
+  --primary-ink: #ffffff;
+  --primary-soft: #ece9ff;
+  --primary-soft-ink: #3a2db0;
+
+  --goals: #ff6b5a;
+  --goals-tint: #ffe4df;
+  --goals-text: #9a2a1c;
+  --meetings: #5b4be8;
+  --meetings-tint: #e6e3ff;
+  --meetings-text: #3a2db0;
+  --decisions: #ffc933;
+  --decisions-tint: #fff1bf;
+  --decisions-text: #6b4e00;
+  --opps: #3dd6a4;
+  --opps-tint: #d5f6ea;
+  --opps-text: #0b6b4c;
+  --projects: #4db8ff;
+  --projects-tint: #daf0ff;
+  --projects-text: #0a5a8f;
+  --library: #b58cff;
+  --library-tint: #ede2ff;
+  --library-text: #5b2fa8;
+  --directory: #ffa77a;
+  --directory-tint: #ffe6d6;
+  --directory-text: #8a3f14;
+
+  --danger: #c0262d;
+  --danger-tint: #ffe3e3;
+
+  --radius-card: 16px;
+  --radius-panel: 24px;
+  --grain: 0.05;
+}
+
+.dark {
+  --bg: #14132a;
+  --surface: #1f1e3a;
+  --ink: #f5f1e8;
+  --ink-soft: #b9b6d3;
+  --line: #34325a;
+  --primary: #9b8cff;
+  --primary-ink: #14132a;
+  --primary-soft: #2c2965;
+  --primary-soft-ink: #cfc8ff;
+
+  --goals: #ff8070;
+  --goals-tint: #4c3245;
+  --goals-text: #ffb4a8;
+  --meetings: #8b7dff;
+  --meetings-tint: #353161;
+  --meetings-text: #c4bcff;
+  --decisions: #ffd45c;
+  --decisions-tint: #4c4241;
+  --decisions-text: #ffe08a;
+  --opps: #55e0b2;
+  --opps-tint: #2a4552;
+  --opps-text: #8eebc9;
+  --projects: #6cc6ff;
+  --projects-tint: #2e4061;
+  --projects-text: #a3daff;
+  --library: #c6a5ff;
+  --library-tint: #403961;
+  --library-text: #dcc8ff;
+  --directory: #ffb78f;
+  --directory-tint: #4c3d4b;
+  --directory-text: #ffcfb3;
+
+  --danger: #ff8a8f;
+  --danger-tint: #4a2433;
+  --grain: 0.08;
+}
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-bg;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-ink);
+  }
+}
+
+@layer components {
+  /* A key element: thick friendly border and a hard colored offset shadow. */
+  .card-key {
+    @apply rounded-card border-2 border-ink bg-surface;
+    box-shadow: 4px 4px 0 var(--accent, var(--primary));
+  }
+  /* A quiet element: hairline border and a soft colored glow. */
+  .card-soft {
+    @apply rounded-card border bg-surface;
+    box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--accent, var(--primary)) 40%, transparent);
+  }
+  .dot-grid {
+    background-image: radial-gradient(color-mix(in srgb, var(--ink) 14%, transparent) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--grain);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
