@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Emoji } from "@/components/brand/emoji";
 import { EmojiTile } from "@/components/brand/emoji-tile";
 import { Highlight } from "@/components/brand/highlight";
@@ -13,7 +14,9 @@ import { FEATURES, FEATURE_KEYS, GOAL_STATUS_STYLE, OPPORTUNITY_TYPE_STYLE, REAC
 
 export const metadata: Metadata = { title: "Design system", robots: { index: false } };
 
+/** Internal component gallery: hidden in production unless ENABLE_DESIGN_PAGE=true. */
 export default function DesignPage() {
+  if (process.env.NODE_ENV === "production" && process.env.ENABLE_DESIGN_PAGE !== "true") notFound();
   return (
     <main className="relative mx-auto max-w-5xl overflow-hidden px-6 py-12">
       <Blob tone="library" shape={0} className="-right-24 -top-24 h-96 w-96" />

@@ -24,12 +24,12 @@ export function Principles() {
       >
         <ul className="grid gap-6 sm:grid-cols-2">
           {PRINCIPLES.map((p, i) => (
-            <Reveal key={p.label} delay={i * 0.06}>
-              <li className="flex flex-col items-start gap-3 rounded-panel border-2 border-ink bg-surface p-6">
+            <li key={p.label}>
+              <Reveal delay={i * 0.06} className="flex h-full flex-col items-start gap-3 rounded-panel border-2 border-ink bg-surface p-6">
                 <Sticker tone={p.tone} tilt={TILTS[i] ?? 0}>{p.label}</Sticker>
                 <p className="text-lg">{p.text}</p>
-              </li>
-            </Reveal>
+              </Reveal>
+            </li>
           ))}
         </ul>
       </Section>

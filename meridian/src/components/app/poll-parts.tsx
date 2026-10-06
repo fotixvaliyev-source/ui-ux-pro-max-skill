@@ -59,7 +59,7 @@ export function PollCard({ circleId, poll }: { circleId: string; poll: PollCardV
   return (
     <article id={`poll-${poll.id}`} className="card-soft flex flex-col gap-4 p-5" style={{ ["--accent" as string]: "var(--primary)" }}>
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <h3 className="font-display text-xl font-bold leading-snug">{poll.question}</h3>
+        <h2 className="font-display text-xl font-bold leading-snug">{poll.question}</h2>
         {poll.closed ? <Pill tone="neutral">Closed</Pill> : <Pill tone="opps">Open</Pill>}
       </div>
       {poll.closesIso ? <p className="text-xs text-ink-soft">{poll.closed ? "Closed" : "Closes"} <LocalTime iso={poll.closesIso} format="full" /></p> : null}

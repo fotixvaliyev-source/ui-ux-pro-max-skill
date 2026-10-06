@@ -19,16 +19,16 @@ export function DecisionStatusPill({ status }: { status: string }) {
   return <Pill tone={s.tone}>{s.label}</Pill>;
 }
 
-export function DecisionCard({ decision, circleId }: { decision: DecisionView; circleId: string }) {
+export function DecisionCard({ decision, circleId, heading: H = "h3" }: { decision: DecisionView; circleId: string; heading?: "h2" | "h3" }) {
   return (
     <Card variant="soft" tone="decisions" className="flex h-full flex-col gap-3 p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs font-bold uppercase tracking-wide text-ink-soft">{formatDate(decision.decidedOn)}</span>
         <DecisionStatusPill status={decision.status} />
       </div>
-      <h3 className="font-display text-lg font-bold leading-snug">
+      <H className="font-display text-lg font-bold leading-snug">
         <Link href={`/app/c/${circleId}/decisions/${decision.id}`} className="hover:underline">{decision.title}</Link>
-      </h3>
+      </H>
       <p className="line-clamp-3 text-sm text-ink-soft">{decision.context}</p>
       {decision.involvedNames.length ? (
         <div className="mt-auto flex items-center gap-2">

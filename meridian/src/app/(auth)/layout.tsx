@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div aria-hidden className="dot-grid absolute inset-0 -z-10 [mask-image:radial-gradient(circle,black,transparent_75%)]" />
       <Blob tone="library" className="-left-32 -top-24 -z-10 h-96 w-96" />
       <Blob tone="directory" shape={1} className="-bottom-28 -right-24 -z-10 h-96 w-96" />
-      <Logo className="mb-8" />
+      <header className="mb-8"><Logo /></header>
       <main className="w-full max-w-md">{children}</main>
     </div>
   );

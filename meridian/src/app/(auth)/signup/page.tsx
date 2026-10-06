@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { safeNext } from "@/lib/action-state";
 import { auth, socialProviders } from "@/server/auth";
 
-export const metadata: Metadata = { title: "Sign up" };
+export const metadata: Metadata = { title: "Sign up", robots: { index: false } };
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next: rawNext } = await searchParams;

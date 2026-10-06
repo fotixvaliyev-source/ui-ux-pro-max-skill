@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { refreshSoon } from "@/lib/refresh";
 import { useEffect, useState, useTransition } from "react";
 import {
-  DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useDroppable, useSensor, useSensors,
-  type DragEndEvent, type DragOverEvent, type DragStartEvent,
+  DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, pointerWithin, useDroppable, useSensor, useSensors,
+  type CollisionDetection, type DragEndEvent, type DragOverEvent, type DragStartEvent,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -37,7 +37,7 @@ export interface BoardColumnView {
 function CardFace({ card, circleId, dragging = false }: { card: BoardCard; circleId: string; dragging?: boolean }) {
   return (
     <div className={cn("rounded-xl border-2 border-ink bg-surface p-3 shadow-[2px_2px_0_var(--projects)] transition-shadow", dragging && "rotate-2 shadow-[4px_6px_0_var(--projects)]")}>
-      <Link href={`/app/c/${circleId}/projects/${card.id}`} className="block font-display text-sm font-bold leading-snug hover:underline">
+      <Link href={`/app/c/${circleId}/projects/${card.id}`} className="block pr-8 font-display text-sm font-bold leading-snug hover:underline">
         {card.title}
       </Link>
       <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
@@ -51,10 +51,21 @@ function CardFace({ card, circleId, dragging = false }: { card: BoardCard; circl
 }
 
 function SortableCard({ card, circleId }: { card: BoardCard; circleId: string }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id, data: { type: "card" } });
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: card.id, data: { type: "card" } });
   return (
-    <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={cn("touch-manipulation", isDragging && "opacity-40")} {...attributes} {...listeners}>
+    <li ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={cn("relative", isDragging && "opacity-40")}>
       <CardFace card={card} circleId={circleId} />
+      {/* The drag handle is the only draggable, focusable control, so the link inside the card is not nested in a button. */}
+      <button
+        type="button"
+        ref={setActivatorNodeRef}
+        aria-label={`Move card: ${card.title}`}
+        className="absolute right-1.5 top-1.5 flex h-8 w-8 cursor-grab touch-none items-center justify-center rounded-lg text-ink-soft hover:bg-projects-tint active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <span aria-hidden className="text-lg leading-none">&#10303;</span>
+      </button>
     </li>
   );
 }
@@ -150,6 +161,12 @@ export function positionBetween(list: { position: number }[], index: number): nu
   return 1024;
 }
 
+/** Prefer what is under the pointer (so dropping on a column works); fall back to the nearest corner for keyboard drags. */
+const collisionDetection: CollisionDetection = (args) => {
+  const hits = pointerWithin(args);
+  return hits.length ? hits : closestCorners(args);
+};
+
 export function KanbanBoard({ circleId, columns: initial, isFounder }: { circleId: string; columns: BoardColumnView[]; isFounder: boolean }) {
   const router = useRouter();
   const [columns, setColumns] = useState(initial);
@@ -216,8 +233,8 @@ export function KanbanBoard({ circleId, columns: initial, isFounder }: { circleI
   return (
     <div className="flex flex-col gap-4">
       {error ? <p role="alert" className="rounded-xl bg-danger-tint px-4 py-2.5 text-sm font-semibold text-danger">{error}</p> : null}
-      <p className="text-sm text-ink-soft">Drag cards between columns, or focus a card and use the space bar and arrow keys.</p>
-      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={() => { setActive(null); setColumns(initial); }}>
+      <p className="text-sm text-ink-soft">Drag cards by their handle between columns, or focus a handle and use the space bar and arrow keys.</p>
+      <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={() => { setActive(null); setColumns(initial); }}>
         <div className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-4">
           {columns.map((c) => (
             <Column key={c.id} column={c} circleId={circleId} isFounder={isFounder} onError={setError} />

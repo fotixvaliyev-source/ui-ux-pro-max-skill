@@ -74,7 +74,7 @@ export default async function DecisionsPage({ params, searchParams }: { params: 
         <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {decisions.map((d) => (
             <li key={d.id}>
-              <DecisionCard circleId={circleId} decision={{ id: d.id, title: d.title, context: d.context, decidedOn: d.decidedOn, status: d.status, involvedNames: d.involved.map((p) => name.get(p.userId) ?? "Former member") }} />
+              <DecisionCard heading="h2" circleId={circleId} decision={{ id: d.id, title: d.title, context: d.context, decidedOn: d.decidedOn, status: d.status, involvedNames: d.involved.map((p) => name.get(p.userId) ?? "Former member") }} />
             </li>
           ))}
         </ul>

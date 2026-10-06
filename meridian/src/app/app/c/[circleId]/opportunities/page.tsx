@@ -77,7 +77,7 @@ export default async function OpportunitiesPage({ params, searchParams }: { para
               <li key={p.id} id={`post-${p.id}`} className="scroll-mt-24">
                 <Card variant="soft" tone="opps" className="flex h-full flex-col gap-3 p-5">
                   <div className="flex flex-wrap items-center justify-between gap-2"><Tag tone={ty.tone}>{ty.label}</Tag><Pill tone={st.tone}>{st.label}</Pill></div>
-                  <h3 className="font-display text-lg font-bold leading-snug"><Link href={`${base}/${p.id}`} className="hover:underline">{p.title}</Link></h3>
+                  <h2 className="font-display text-lg font-bold leading-snug"><Link href={`${base}/${p.id}`} className="hover:underline">{p.title}</Link></h2>
                   <p className="line-clamp-3 text-sm text-ink-soft">{p.description}</p>
                   <div className="flex flex-wrap gap-1.5">{parseTags(p.tags).map((x) => (<Tag key={x}>{x}</Tag>))}</div>
                   <div className="mt-auto flex items-center gap-2 text-xs text-ink-soft">

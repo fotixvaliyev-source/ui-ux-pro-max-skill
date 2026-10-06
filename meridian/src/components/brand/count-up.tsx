@@ -21,7 +21,8 @@ export function CountUp({ to, className }: { to: number; className?: string }) {
   }, [inView, reduce, to]);
 
   return (
-    <span ref={ref} className={className} aria-label={String(to)}>
+    <span ref={ref} className={className}>
+      <span className="sr-only">{to}</span>
       <span aria-hidden>{value}</span>
     </span>
   );

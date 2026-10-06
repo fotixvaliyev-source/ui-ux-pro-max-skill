@@ -38,9 +38,13 @@ export function MemberCard({ member, circleId, full = false }: { member: MemberV
       <div className="flex items-start gap-3">
         <Avatar name={member.name} size="lg" />
         <div className="min-w-0">
-          <h3 className="font-display text-lg font-bold leading-tight">
-            {full ? member.name : <Link href={`/app/c/${circleId}/members/${member.userId}`} className="hover:underline">{member.name}</Link>}
-          </h3>
+          {full ? (
+            <h1 className="font-display text-2xl font-extrabold leading-tight">{member.name}</h1>
+          ) : (
+            <h2 className="font-display text-lg font-bold leading-tight">
+              <Link href={`/app/c/${circleId}/members/${member.userId}`} className="hover:underline">{member.name}</Link>
+            </h2>
+          )}
           {member.headline ? <p className="text-sm text-ink-soft">{member.headline}</p> : null}
           {roleLine ? <p className="text-sm font-medium">{roleLine}</p> : null}
           <div className="mt-1.5 flex flex-wrap gap-1.5">

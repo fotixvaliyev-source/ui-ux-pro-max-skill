@@ -33,8 +33,9 @@ export function AppHeader({ user, circles, unread }: AppHeaderProps) {
           </Link>
           <ThemeToggle />
           <details className="group relative">
-            <summary className="flex h-10 cursor-pointer list-none items-center rounded-full [&::-webkit-details-marker]:hidden" aria-label="Account menu">
+            <summary className="flex h-10 cursor-pointer list-none items-center rounded-full [&::-webkit-details-marker]:hidden">
               <Avatar name={display} size="md" className="border-ink" />
+              <span className="sr-only">Account menu</span>
             </summary>
             <div className="card-soft absolute right-0 mt-2 w-56 p-2">
               <p className="truncate px-3 py-2 text-sm font-semibold">{display}</p>

@@ -15,8 +15,8 @@ export function Steps({ withDetail = false }: { withDetail?: boolean }) {
     >
       <ol className="grid gap-6 lg:grid-cols-3">
         {STEPS.map((s, i) => (
-          <Reveal key={s.title} delay={i * 0.1}>
-            <li className="relative h-full rounded-panel border-2 border-ink bg-surface p-7 pt-14">
+          <li key={s.title} className="relative">
+            <Reveal delay={i * 0.1} className="relative h-full rounded-panel border-2 border-ink bg-surface p-7 pt-14">
               <span
                 aria-hidden
                 className={cn(
@@ -30,8 +30,8 @@ export function Steps({ withDetail = false }: { withDetail?: boolean }) {
               <h3 className="mb-2 text-2xl font-extrabold">{s.title}</h3>
               <p className="text-ink-soft">{s.text}</p>
               {withDetail ? <p className="mt-3 text-sm font-medium">{s.detail}</p> : null}
-            </li>
-          </Reveal>
+            </Reveal>
+          </li>
         ))}
       </ol>
     </Section>
