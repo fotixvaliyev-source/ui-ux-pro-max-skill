@@ -35,7 +35,7 @@ export async function exportCsv(actorId: string, circleId: string, dataset: CsvD
       filename: `${slug}-decisions.csv`,
       body: toCsv(
         ["Date", "Decision", "Status", "Context and reasoning", "Involved", "Meeting"],
-        rows.map((d) => [day(d.decidedOn), d.title, DECISION_STATUS_STYLE[d.status as DecisionStatus]?.label ?? d.status, d.context, d.involved.map((p) => who(p.userId)).join("; "), d.meeting?.title ?? ""]),
+        rows.map((d) => [day(d.decidedOn), d.title, DECISION_STATUS_STYLE[d.status as DecisionStatus]?.label ?? d.status, d.context, d.involved.map((p) => who(p.userId)).sort().join("; "), d.meeting?.title ?? ""]),
       ),
     };
   }
@@ -70,7 +70,7 @@ export async function exportMarkdown(actorId: string, circleId: string): Promise
   if (decisions.length === 0) out.push("No decisions logged.", "");
   for (const d of decisions) {
     out.push(`### ${d.title}`, "", `- Date: ${day(d.decidedOn)}`, `- Status: ${DECISION_STATUS_STYLE[d.status as DecisionStatus]?.label ?? d.status}`);
-    if (d.involved.length) out.push(`- Involved: ${d.involved.map((p) => who(p.userId)).join(", ")}`);
+    if (d.involved.length) out.push(`- Involved: ${d.involved.map((p) => who(p.userId)).sort().join(", ")}`);
     out.push("", d.context, "");
   }
 
