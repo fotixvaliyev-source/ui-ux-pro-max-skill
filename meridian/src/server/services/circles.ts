@@ -119,6 +119,7 @@ export async function deleteCircle(actorId: string, circleId: string, confirmNam
   if (confirmName.trim() !== circle.name) throw new UserError("Type the circle name exactly to confirm.");
   await db.$transaction([
     db.notification.deleteMany({ where: { circleId } }),
+    db.reaction.deleteMany({ where: { circleId } }),
     db.circle.delete({ where: { id: circleId } }),
   ]);
 }

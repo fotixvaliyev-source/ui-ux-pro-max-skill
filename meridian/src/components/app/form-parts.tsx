@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useRef, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import type { ActionState } from "@/lib/action-state";
@@ -14,14 +15,39 @@ const PendingContext = createContext(false);
  */
 export function ActionForm({
   action,
+  state,
+  resetOnSuccess = false,
   children,
   ...props
-}: Omit<React.FormHTMLAttributes<HTMLFormElement>, "action" | "onSubmit"> & { action: (payload: FormData) => void }) {
+}: Omit<React.FormHTMLAttributes<HTMLFormElement>, "action" | "onSubmit"> & {
+  action: (payload: FormData) => void;
+  /** The state returned by useActionState; needed for resetOnSuccess. */
+  state?: ActionState;
+  /** Clear the fields after a successful submit (e.g. a comment box). */
+  resetOnSuccess?: boolean;
+}) {
   const [pending, start] = useTransition();
+  const ref = useRef<HTMLFormElement>(null);
+  const router = useRouter();
+  useEffect(() => {
+    if (resetOnSuccess && state?.ok) ref.current?.reset();
+  }, [resetOnSuccess, state]);
+  // Actions return where to go instead of calling redirect(): client navigation is more reliable than a redirect thrown from a server action.
+  useEffect(() => {
+    if (!state?.ok) return;
+    const to = state.data?.redirectTo;
+    if (!to) {
+      router.refresh(); // show the saved data; actions never revalidate on the server
+      return;
+    }
+    if (state.data?.hard) window.location.assign(to);
+    else router.push(to);
+  }, [state, router]);
   return (
     <PendingContext.Provider value={pending}>
       <form
         {...props}
+        ref={ref}
         onSubmit={(e) => {
           e.preventDefault();
           const data = new FormData(e.currentTarget);

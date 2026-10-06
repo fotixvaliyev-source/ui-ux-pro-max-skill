@@ -1,24 +1,19 @@
-import { Button } from "@/components/ui/button";
-import { socialSignInAction } from "@/server/actions/auth";
-import { socialProviders } from "@/server/auth";
+"use client";
 
-/** Shown only for providers whose env vars are set. */
-export function SocialButtons({ next }: { next?: string }) {
-  const items = [
-    socialProviders.google ? { id: "google", label: "Continue with Google" } : null,
-    socialProviders.linkedin ? { id: "linkedin", label: "Continue with LinkedIn" } : null,
-  ].filter((i) => i !== null);
+import { signIn } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { safeNext } from "@/lib/action-state";
+
+/** Rendered only for providers whose env vars are set (the server page passes the flags). */
+export function SocialButtons({ next, google, linkedin }: { next?: string; google: boolean; linkedin: boolean }) {
+  const items = [google ? { id: "google", label: "Continue with Google" } : null, linkedin ? { id: "linkedin", label: "Continue with LinkedIn" } : null].filter((i) => i !== null);
   if (items.length === 0) return null;
   return (
     <div className="flex flex-col gap-3">
       {items.map((p) => (
-        <form key={p.id} action={socialSignInAction}>
-          <input type="hidden" name="provider" value={p.id} />
-          {next ? <input type="hidden" name="next" value={next} /> : null}
-          <Button type="submit" variant="secondary" className="w-full">
-            {p.label}
-          </Button>
-        </form>
+        <Button key={p.id} type="button" variant="secondary" className="w-full" onClick={() => signIn(p.id, { callbackUrl: safeNext(next, "/app") })}>
+          {p.label}
+        </Button>
       ))}
       <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-ink-soft" aria-hidden>
         <span className="h-px flex-1 bg-line" /> or <span className="h-px flex-1 bg-line" />

@@ -50,6 +50,8 @@ export function OnboardingWizard({ defaults, next }: { defaults: ProfileDefaults
     return r;
   }, initialState);
 
+  const [finishState, finishAction] = useActionState(finishOnboardingAction, initialState);
+
   return (
     <div className="mx-auto w-full max-w-2xl">
       <div className="mb-8">
@@ -120,11 +122,11 @@ export function OnboardingWizard({ defaults, next }: { defaults: ProfileDefaults
               </li>
             ))}
           </ul>
-          <form action={finishOnboardingAction}>
+          <ActionForm action={finishAction} state={finishState}>
             <input type="hidden" name="circleId" value={circleId} />
             {next ? <input type="hidden" name="next" value={next} /> : null}
             <SubmitButton size="lg" pending="Opening your circle...">{circleId ? "Take me to my circle" : "Take me to the app"}</SubmitButton>
-          </form>
+          </ActionForm>
         </Card>
       ) : null}
     </div>

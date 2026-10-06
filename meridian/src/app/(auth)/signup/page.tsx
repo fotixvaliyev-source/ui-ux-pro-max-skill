@@ -4,7 +4,7 @@ import { SignupForm } from "@/components/app/auth-forms";
 import { SocialButtons } from "@/components/app/social-buttons";
 import { Card } from "@/components/ui/card";
 import { safeNext } from "@/lib/action-state";
-import { auth } from "@/server/auth";
+import { auth, socialProviders } from "@/server/auth";
 
 export const metadata: Metadata = { title: "Sign up" };
 
@@ -18,7 +18,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
       <h1 className="text-3xl font-extrabold">Start your circle</h1>
       <p className="mb-6 mt-1 text-ink-soft">Create your account. It takes under a minute.</p>
       <div className="flex flex-col gap-5">
-        <SocialButtons next={next} />
+        <SocialButtons next={next} google={socialProviders.google} linkedin={socialProviders.linkedin} />
         <SignupForm next={next} />
       </div>
     </Card>

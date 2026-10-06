@@ -3,7 +3,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Emoji } from "@/components/brand/emoji";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/brand/theme-toggle";
-import { logoutAction } from "@/server/actions/auth";
+import { LogoutButton } from "./logout-button";
 import { CircleSwitcher, type SwitcherCircle } from "./circle-switcher";
 
 interface AppHeaderProps {
@@ -40,9 +40,7 @@ export function AppHeader({ user, circles, unread }: AppHeaderProps) {
               <p className="truncate px-3 py-2 text-sm font-semibold">{display}</p>
               <Link href="/app/settings" className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-primary-soft">My profile</Link>
               <Link href="/app/tasks" className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-primary-soft sm:hidden">My tasks</Link>
-              <form action={logoutAction}>
-                <button type="submit" className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-primary-soft">Log out</button>
-              </form>
+              <LogoutButton />
             </div>
           </details>
         </div>

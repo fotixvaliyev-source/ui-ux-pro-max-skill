@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { db } from "@/server/db";
 import { requireMember, requireUser } from "@/server/guards";
 import { succeed, type ActionState } from "@/lib/action-state";
@@ -28,7 +27,6 @@ export async function updateProfileAction(_prev: ActionState, formData: FormData
       db.user.update({ where: { id: user.id }, data: { name } }),
       db.profile.upsert({ where: { userId: user.id }, create: { userId: user.id, ...data }, update: data }),
     ]);
-    revalidatePath("/app", "layout");
     return succeed();
   });
 }
@@ -47,7 +45,6 @@ export async function updateCircleProfileAction(circleId: string, _prev: ActionS
         lookingFor: parsed.data.lookingFor ?? null,
       },
     });
-    revalidatePath(`/app/c/${circleId}/members`, "layout");
     return succeed();
   });
 }

@@ -13,7 +13,7 @@ import { ProfileFields, type ProfileDefaults } from "./profile-fields";
 export function CreateCircleForm() {
   const [state, action] = useActionState(createCircleAction, initialState);
   return (
-    <ActionForm action={action} className="flex flex-col gap-5">
+    <ActionForm action={action} state={state} className="flex flex-col gap-5">
       <CircleFields state={state} />
       <FormMessage state={state} />
       <SubmitButton size="lg" pending="Creating...">Create circle</SubmitButton>
@@ -24,7 +24,7 @@ export function CreateCircleForm() {
 export function JoinCircleForm() {
   const [state, action] = useActionState(joinCircleAction, initialState);
   return (
-    <ActionForm action={action} className="flex flex-col gap-5">
+    <ActionForm action={action} state={state} className="flex flex-col gap-5">
       <Field label="Invite code" htmlFor="code" hint="8 letters and numbers." error={fieldError(state, "code")}>
         <Input id="code" name="code" autoCapitalize="characters" autoComplete="off" spellCheck={false} maxLength={12} className="font-display text-xl uppercase tracking-[0.2em]" required />
       </Field>
@@ -37,7 +37,7 @@ export function JoinCircleForm() {
 export function EditCircleForm({ circleId, defaults }: { circleId: string; defaults: CircleDefaults }) {
   const [state, action] = useActionState(updateCircleAction.bind(null, circleId), initialState);
   return (
-    <ActionForm action={action} className="flex flex-col gap-5">
+    <ActionForm action={action} state={state} className="flex flex-col gap-5">
       <CircleFields state={state} defaults={defaults} idPrefix="e-" />
       <FormMessage state={state} success="Saved." />
       <SubmitButton pending="Saving...">Save changes</SubmitButton>
@@ -48,7 +48,7 @@ export function EditCircleForm({ circleId, defaults }: { circleId: string; defau
 export function EditProfileForm({ defaults }: { defaults: ProfileDefaults }) {
   const [state, action] = useActionState(updateProfileAction, initialState);
   return (
-    <ActionForm action={action} className="flex flex-col gap-5">
+    <ActionForm action={action} state={state} className="flex flex-col gap-5">
       <ProfileFields state={state} defaults={defaults} />
       <FormMessage state={state} success="Profile saved." />
       <SubmitButton pending="Saving...">Save profile</SubmitButton>
@@ -59,7 +59,7 @@ export function EditProfileForm({ defaults }: { defaults: ProfileDefaults }) {
 export function EditCircleProfileForm({ circleId, defaults }: { circleId: string; defaults: { workingOn?: string | null; canHelpWith?: string | null; lookingFor?: string | null } }) {
   const [state, action] = useActionState(updateCircleProfileAction.bind(null, circleId), initialState);
   return (
-    <ActionForm action={action} className="flex flex-col gap-5">
+    <ActionForm action={action} state={state} className="flex flex-col gap-5">
       <FormGrid>
         <Field label="Currently working on" htmlFor="workingOn" error={fieldError(state, "workingOn")}>
           <Textarea id="workingOn" name="workingOn" defaultValue={defaults.workingOn ?? ""} maxLength={300} />

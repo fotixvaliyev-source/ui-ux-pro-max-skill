@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,10 +16,16 @@ import { FormMessage, SubmitButton, fieldError, ActionForm } from "./form-parts"
 function useRun() {
   const [error, setError] = useState<string>("");
   const [pending, start] = useTransition();
+  const router = useRouter();
   const run = (fn: () => Promise<ActionState>) =>
     start(async () => {
       const r = await fn();
       setError(r.ok ? "" : (r.error ?? "Something went wrong."));
+      const to = r.ok ? r.data?.redirectTo : undefined;
+      if (to) {
+        if (r.data?.hard) window.location.assign(to);
+        else router.push(to);
+      } else if (r.ok) router.refresh();
     });
   return { error, pending, run };
 }
@@ -147,7 +154,7 @@ export function LeaveCircleButton({ circleId }: { circleId: string }) {
 export function DeleteCircleForm({ circleId, circleName }: { circleId: string; circleName: string }) {
   const [state, action] = useActionState(deleteCircleAction.bind(null, circleId), initialState);
   return (
-    <ActionForm action={action} className="flex flex-col gap-4">
+    <ActionForm action={action} state={state} className="flex flex-col gap-4">
       <Field label={`Type "${circleName}" to confirm`} htmlFor="confirmName" error={fieldError(state, "confirmName")}>
         <Input id="confirmName" name="confirmName" autoComplete="off" required />
       </Field>

@@ -348,6 +348,7 @@ model Comment {
 // `scope` is the comment id or "TYPE:targetId", so one non-null column can be unique.
 model Reaction {
   id         String   @id @default(cuid())
+  circleId   String
   scope      String
   commentId  String?
   targetType String?
@@ -359,6 +360,7 @@ model Reaction {
 
   @@unique([userId, scope, key])
   @@index([scope])
+  @@index([circleId])
 }
 
 model Notification {

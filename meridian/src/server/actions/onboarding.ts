@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { db } from "@/server/db";
 import { requireUser } from "@/server/guards";
 import { safeNext, succeed, type ActionState } from "@/lib/action-state";
@@ -30,7 +28,6 @@ export async function saveProfileAction(_prev: ActionState, formData: FormData):
       db.user.update({ where: { id: user.id }, data: { name } }),
       db.profile.upsert({ where: { userId: user.id }, create: { userId: user.id, ...profileData }, update: profileData }),
     ]);
-    revalidatePath("/app", "layout");
     return succeed();
   });
 }
@@ -56,11 +53,11 @@ export async function joinWithCodeAction(_prev: ActionState, formData: FormData)
 }
 
 /** Marks onboarding done and lands the user in their circle. */
-export async function finishOnboardingAction(formData: FormData): Promise<void> {
+export async function finishOnboardingAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
   await db.user.update({ where: { id: user.id }, data: { onboardedAt: new Date() } });
   const circleId = String(formData.get("circleId") ?? "");
   const member = circleId ? await db.membership.findUnique({ where: { circleId_userId: { circleId, userId: user.id } }, select: { circleId: true } }) : null;
   const next = safeNext(String(formData.get("next") ?? ""), "");
-  redirect(member ? `/app/c/${member.circleId}` : next || "/app");
+  return succeed({ redirectTo: member ? `/app/c/${member.circleId}` : next || "/app", hard: "1" });
 }

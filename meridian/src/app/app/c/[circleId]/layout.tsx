@@ -12,7 +12,7 @@ export default async function CircleLayout({ children, params }: { children: Rea
   const accent = (CIRCLE_ACCENTS as readonly string[]).includes(circle.accent) ? (circle.accent as (typeof CIRCLE_ACCENTS)[number]) : "indigo";
   return (
     <div className="grid gap-8 lg:grid-cols-[13rem_1fr]">
-      <aside className="lg:sticky lg:top-24 lg:self-start">
+      <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
         <div className="mb-4 flex items-start gap-3">
           <span aria-hidden className={`mt-1 h-10 w-2 shrink-0 rounded-full ${TONE_SOLID[ACCENT_TONE[accent]]}`} />
           <div className="min-w-0">

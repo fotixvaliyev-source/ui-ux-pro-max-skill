@@ -10,6 +10,7 @@ export interface NavItem {
 /** Circle navigation. Entries are added as each area ships. */
 export const CIRCLE_NAV: NavItem[] = [
   { href: "", label: "Home", emoji: "home", feature: "primary" },
+  { href: "/goals", label: "Goals", emoji: "target", feature: "goals" },
   { href: "/members", label: "Members", emoji: "people", feature: "directory" },
   { href: "/settings", label: "Settings", emoji: "compass", feature: "primary" },
 ];

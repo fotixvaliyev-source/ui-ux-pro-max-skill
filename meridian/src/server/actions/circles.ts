@@ -1,7 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { requireUser } from "@/server/guards";
 import { succeed, type ActionState } from "@/lib/action-state";
 import { circleSchema, idSchema, inviteCodeSchema } from "@/server/validation/circle";
@@ -22,7 +20,7 @@ export async function createCircleAction(_prev: ActionState, formData: FormData)
     return succeed();
   });
   if (!state.ok) return state;
-  redirect(`/app/c/${circleId}`);
+  return succeed({ redirectTo: `/app/c/${circleId}` });
 }
 
 export async function joinCircleAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -35,7 +33,7 @@ export async function joinCircleAction(_prev: ActionState, formData: FormData): 
     return succeed();
   });
   if (!state.ok) return state;
-  redirect(`/app/c/${circleId}`);
+  return succeed({ redirectTo: `/app/c/${circleId}` });
 }
 
 export async function updateCircleAction(circleId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -44,7 +42,6 @@ export async function updateCircleAction(circleId: string, _prev: ActionState, f
     const parsed = parseForm(circleSchema, formData);
     if ("state" in parsed) return parsed.state;
     await updateCircle(user.id, idSchema.parse(circleId), parsed.data);
-    revalidatePath(`/app/c/${circleId}`, "layout");
     return succeed();
   });
 }
@@ -53,7 +50,6 @@ export async function regenerateInviteAction(circleId: string): Promise<ActionSt
   return guarded(async () => {
     const user = await requireUser();
     await regenerateInviteCode(user.id, idSchema.parse(circleId));
-    revalidatePath(`/app/c/${circleId}/settings`);
     return succeed();
   });
 }
@@ -62,7 +58,6 @@ export async function setInviteOpenAction(circleId: string, open: boolean): Prom
   return guarded(async () => {
     const user = await requireUser();
     await setInviteOpen(user.id, idSchema.parse(circleId), open);
-    revalidatePath(`/app/c/${circleId}/settings`);
     return succeed();
   });
 }
@@ -71,7 +66,6 @@ export async function removeMemberAction(circleId: string, targetUserId: string)
   return guarded(async () => {
     const user = await requireUser();
     await removeMember(user.id, idSchema.parse(circleId), idSchema.parse(targetUserId));
-    revalidatePath(`/app/c/${circleId}`, "layout");
     return succeed();
   });
 }
@@ -80,7 +74,6 @@ export async function setMemberRoleAction(circleId: string, targetUserId: string
   return guarded(async () => {
     const user = await requireUser();
     await setMemberRole(user.id, idSchema.parse(circleId), idSchema.parse(targetUserId), roleSchema.parse(role));
-    revalidatePath(`/app/c/${circleId}`, "layout");
     return succeed();
   });
 }
@@ -92,7 +85,7 @@ export async function leaveCircleAction(circleId: string): Promise<ActionState> 
     return succeed();
   });
   if (!state.ok) return state;
-  redirect("/app");
+  return succeed({ redirectTo: "/app" });
 }
 
 export async function deleteCircleAction(circleId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -102,5 +95,5 @@ export async function deleteCircleAction(circleId: string, _prev: ActionState, f
     return succeed();
   });
   if (!state.ok) return state;
-  redirect("/app");
+  return succeed({ redirectTo: "/app", hard: "1" });
 }

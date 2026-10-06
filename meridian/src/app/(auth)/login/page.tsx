@@ -4,7 +4,7 @@ import { LoginForm } from "@/components/app/auth-forms";
 import { SocialButtons } from "@/components/app/social-buttons";
 import { Card } from "@/components/ui/card";
 import { safeNext } from "@/lib/action-state";
-import { auth } from "@/server/auth";
+import { auth, socialProviders } from "@/server/auth";
 
 export const metadata: Metadata = { title: "Log in" };
 
@@ -18,7 +18,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
       <h1 className="text-3xl font-extrabold">Welcome back</h1>
       <p className="mb-6 mt-1 text-ink-soft">Log in to your circles.</p>
       <div className="flex flex-col gap-5">
-        <SocialButtons next={next} />
+        <SocialButtons next={next} google={socialProviders.google} linkedin={socialProviders.linkedin} />
         <LoginForm next={next} />
       </div>
     </Card>
