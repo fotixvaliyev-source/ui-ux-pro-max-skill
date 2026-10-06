@@ -8,3 +8,4 @@ prisma/dev.db*
 next-env.d.ts
 tsconfig.tsbuildinfo
 coverage
+uploads

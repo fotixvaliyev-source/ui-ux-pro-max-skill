@@ -31,8 +31,9 @@ export async function createCircle(userId: string, input: CircleInput): Promise<
     },
     select: { id: true },
   });
+  const creator = await db.user.findUnique({ where: { id: userId }, select: { name: true } });
   await db.activity.create({
-    data: { circleId: circle.id, actorId: userId, verb: "created", summary: `started ${input.name}`, href: `/app/c/${circle.id}` },
+    data: { circleId: circle.id, actorId: userId, verb: "created", summary: `${creator?.name ?? "Someone"} started ${input.name}`, href: `/app/c/${circle.id}` },
   });
   return circle;
 }

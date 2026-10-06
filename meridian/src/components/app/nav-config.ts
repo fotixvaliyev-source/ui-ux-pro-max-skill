@@ -17,6 +17,7 @@ export const CIRCLE_NAV: NavItem[] = [
   { href: "/opportunities", label: "Opportunities", emoji: "seedling", feature: "opps" },
   { href: "/projects", label: "Projects", emoji: "puzzle", feature: "projects" },
   { href: "/polls", label: "Polls", emoji: "ballot", feature: "primary" },
+  { href: "/library", label: "Library", emoji: "books", feature: "library" },
   { href: "/members", label: "Members", emoji: "people", feature: "directory" },
   { href: "/settings", label: "Settings", emoji: "compass", feature: "primary" },
 ];

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DeleteCircleForm, InvitePanel, LeaveCircleButton, MemberAdminList } from "@/components/app/circle-admin";
 import { EditCircleForm } from "@/components/app/simple-forms";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { loadMembers } from "@/lib/members";
 import { getCircleContext } from "@/server/guards";
@@ -43,6 +44,15 @@ export default async function CircleSettingsPage({ params }: { params: Promise<{
           <p className="mt-3 text-sm text-ink-soft">Only a Founder can change settings or invite people.</p>
         </Block>
       )}
+
+      <Block title="Export your data" intro="Decisions, meeting notes and action items are yours. Download them any time.">
+        <div className="flex flex-wrap gap-3">
+          <Button asChild size="sm"><a href={`/api/circles/${circle.id}/export?format=md`}>Everything as Markdown</a></Button>
+          <Button asChild size="sm" variant="secondary"><a href={`/api/circles/${circle.id}/export?format=csv&dataset=decisions`}>Decisions (CSV)</a></Button>
+          <Button asChild size="sm" variant="secondary"><a href={`/api/circles/${circle.id}/export?format=csv&dataset=notes`}>Meeting notes (CSV)</a></Button>
+          <Button asChild size="sm" variant="secondary"><a href={`/api/circles/${circle.id}/export?format=csv&dataset=actions`}>Action items (CSV)</a></Button>
+        </div>
+      </Block>
 
       <Block title="Leave circle" intro="You will lose access to everything in it until someone invites you again.">
         <LeaveCircleButton circleId={circle.id} />
