@@ -99,3 +99,14 @@ export const OPPORTUNITY_STATUS_STYLE: Record<OpportunityStatus, { label: string
 };
 
 export type Tone = FeatureKey | "primary" | "neutral" | "danger";
+
+/** Circle accent -> the tone used for its color strip. */
+export const ACCENT_TONE: Record<(typeof CIRCLE_ACCENTS)[number], Tone> = {
+  indigo: "primary",
+  coral: "goals",
+  mint: "opps",
+  sky: "projects",
+  lilac: "library",
+  yellow: "decisions",
+  peach: "directory",
+};
