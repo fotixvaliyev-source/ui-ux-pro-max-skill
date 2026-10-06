@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { refreshSoon } from "@/lib/refresh";
 import { useActionState, useState, useTransition } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Field, Input, Select } from "@/components/ui/form";
@@ -43,7 +44,7 @@ export function TaskRow({ task, showOwner = true }: { task: TaskView; showOwner?
         setError(r.error ?? "Could not update.");
       } else {
         setError("");
-        router.refresh();
+        refreshSoon(router);
       }
     });
   }
@@ -88,7 +89,7 @@ export function TaskRow({ task, showOwner = true }: { task: TaskView; showOwner?
             if (!window.confirm("Delete this action item?")) return;
             start(async () => {
               const r = await deleteActionItemAction(task.circleId, task.id);
-              if (r.ok) router.refresh();
+              if (r.ok) refreshSoon(router);
               else setError(r.error ?? "Could not delete.");
             });
           }}

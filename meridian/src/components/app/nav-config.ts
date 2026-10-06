@@ -14,6 +14,9 @@ export const CIRCLE_NAV: NavItem[] = [
   { href: "/meetings", label: "Meetings", emoji: "calendar", feature: "meetings" },
   { href: "/decisions", label: "Decisions", emoji: "scales", feature: "decisions" },
   { href: "/tasks", label: "Tasks", emoji: "check", feature: "primary" },
+  { href: "/opportunities", label: "Opportunities", emoji: "seedling", feature: "opps" },
+  { href: "/projects", label: "Projects", emoji: "puzzle", feature: "projects" },
+  { href: "/polls", label: "Polls", emoji: "ballot", feature: "primary" },
   { href: "/members", label: "Members", emoji: "people", feature: "directory" },
   { href: "/settings", label: "Settings", emoji: "compass", feature: "primary" },
 ];

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { refreshSoon } from "@/lib/refresh";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ function useRun() {
       if (to) {
         if (r.data?.hard) window.location.assign(to);
         else router.push(to);
-      } else if (r.ok) router.refresh();
+      } else if (r.ok) refreshSoon(router);
     });
   return { error, pending, run };
 }

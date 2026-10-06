@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { refreshSoon } from "@/lib/refresh";
 import { useOptimistic, useState, useTransition } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/form";
@@ -45,7 +46,7 @@ export function ReactionBar({ circleId, on, id, reactions }: { circleId: string;
             start(async () => {
               setOptimistic(r.key);
               await toggleReactionAction(circleId, on, id, r.key);
-              router.refresh();
+              refreshSoon(router);
             })
           }
           className={cn(
@@ -109,7 +110,7 @@ export function Discussion({ circleId, targetType, targetId, comments, viewerId,
                       start(async () => {
                         const r = await deleteCommentAction(circleId, c.id);
                         setError(r.ok ? "" : (r.error ?? "Could not delete."));
-                        if (r.ok) router.refresh();
+                        if (r.ok) refreshSoon(router);
                       });
                     }}
                     className="ml-auto text-xs font-semibold text-ink-soft hover:text-danger"

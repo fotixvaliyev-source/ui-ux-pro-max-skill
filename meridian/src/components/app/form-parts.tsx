@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { refreshSoon } from "@/lib/refresh";
 import { createContext, useContext, useEffect, useRef, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { Button, type ButtonProps } from "@/components/ui/button";
@@ -37,7 +38,7 @@ export function ActionForm({
     if (!state?.ok) return;
     const to = state.data?.redirectTo;
     if (!to) {
-      router.refresh(); // show the saved data; actions never revalidate on the server
+      refreshSoon(router); // show the saved data; actions never revalidate on the server
       return;
     }
     if (state.data?.hard) window.location.assign(to);

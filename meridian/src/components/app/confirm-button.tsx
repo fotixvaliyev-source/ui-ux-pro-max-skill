@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { refreshSoon } from "@/lib/refresh";
 import { useState, useTransition } from "react";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import type { ActionState } from "@/lib/action-state";
@@ -31,7 +32,7 @@ export function ConfirmActionButton({
             }
             setError("");
             if (r.data?.redirectTo) router.push(r.data.redirectTo);
-            else router.refresh();
+            else refreshSoon(router);
           });
         }}
       >

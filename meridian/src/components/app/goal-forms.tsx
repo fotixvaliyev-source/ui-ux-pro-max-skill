@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { refreshSoon } from "@/lib/refresh";
 import { useActionState, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/form";
@@ -84,7 +85,7 @@ export function StatusControl({ circleId, goalId, status }: { circleId: string; 
               setError(r.error ?? "Could not update the status.");
             } else {
               setError("");
-              router.refresh();
+              refreshSoon(router);
             }
           });
         }}
