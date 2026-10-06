@@ -54,3 +54,17 @@ export const TONE_FILL: Record<Tone, string> = {
   neutral: "text-ink-soft",
   danger: "text-danger",
 };
+
+/** Tint as a plain background (text color left to the parent). */
+export const TONE_TINT_BG: Record<Tone, string> = {
+  goals: "bg-goals-tint",
+  meetings: "bg-meetings-tint",
+  decisions: "bg-decisions-tint",
+  opps: "bg-opps-tint",
+  projects: "bg-projects-tint",
+  library: "bg-library-tint",
+  directory: "bg-directory-tint",
+  primary: "bg-primary-soft",
+  neutral: "bg-line",
+  danger: "bg-danger-tint",
+};
